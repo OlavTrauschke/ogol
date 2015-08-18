@@ -47,8 +47,8 @@ Bonus:
 
 start syntax Program = Command*; 
 
-
-syntax FunDef = /* todo */;
+syntax FunDef = "to" FunId VarId* Command* "end";
+syntax FunCall = FunId Expr* ";";
 
 syntax Expr = var: VarId
 			| number: Number
@@ -71,13 +71,35 @@ lexical Number = "-"?[0-9]+("."[0-9]+)?
 
 lexical Boolean = "true" | "false";
 
-syntax Command = /* todo */;
+syntax Command = cond: "if" Expr Block
+			   | cond2: "ifelse" Expr Block Block
+			   | wLoop: "while" Expr Block
+			   | rLoop: "repeat" Expr Block
+			   | move: Move Expr ";"
+			   | home: "home"
+			   | pen: PenAct ";"
+			   | def: FunDef
+			   | call: FunCall;
+
+syntax Block = "[" Command* "]";
+
+lexical Move = Forward | Back | Right | Left;
+lexical Forward = "forward" | "fd";
+lexical Back = "back" | "bk";
+lexical Right = "right" | "rt";
+lexical Left = "left" | "lt";
+
+lexical PenAct = "pendown" | "pd" | "penup" | "pu";
+
+keyword Reserved = "if" | "ifelse" | "while" | "repeat" | "forward" | "back"
+				 | "right" | "left" | "pendown" | "penup" | "to" | "true" | "false" | "end";
+
 
 lexical VarId
-  = ":" [a-zA-Z][a-zA-Z0-9]* !>> [a-zA-Z0-9];
+  = ":" [a-zA-Z][a-zA-Z0-9]* \ Reserved !>> [a-zA-Z0-9];
   
 lexical FunId
-  = [a-zA-Z][a-zA-Z0-9]* !>> [a-zA-Z0-9];
+  = [a-zA-Z][a-zA-Z0-9]* \ Reserved !>> [a-zA-Z0-9];
 
 layout Standard 
   = WhitespaceOrComment* !>> [\ \t\n\r] !>> "--";
