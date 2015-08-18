@@ -115,7 +115,7 @@ lexical Whitespace
   ;
 
 lexical Comment
-  = @category="Comment" "--" ![\n\r]* $
+  = @category="Comment" "--" ![\n\r]* [\r][\n]
   ;
 
 bool testExpr(str txt) {
