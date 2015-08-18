@@ -91,15 +91,16 @@ lexical Left = "left" | "lt";
 
 lexical PenAct = "pendown" | "pd" | "penup" | "pu";
 
-keyword Reserved = "if" | "ifelse" | "while" | "repeat" | "forward" | "back"
-				 | "right" | "left" | "pendown" | "penup" | "to" | "true" | "false" | "end";
+keyword Reserved = "if" | "ifelse" | "while" | "repeat" | "forward" | "fd" | "back" | "bk"
+				 | "right" | "rt" | "left" | "lt" | "pendown" | "pd" | "penup" | "pu" | "to"
+				 | "true" | "false" | "end";
 
 
 lexical VarId
-  = ":" [a-zA-Z][a-zA-Z0-9]* \ Reserved !>> [a-zA-Z0-9];
+  = ":" ([a-zA-Z][a-zA-Z0-9]*) \ Reserved !>> [a-zA-Z0-9];
   
 lexical FunId
-  = [a-zA-Z][a-zA-Z0-9]* \ Reserved !>> [a-zA-Z0-9];
+  = ([a-zA-Z][a-zA-Z0-9]*) \ Reserved !>> [a-zA-Z0-9];
 
 layout Standard 
   = WhitespaceOrComment* !>> [\ \t\n\r] !>> "--";
@@ -114,36 +115,75 @@ lexical Whitespace
   ;
 
 lexical Comment
-  = @category="Comment" "--" ![\n\r]* [\r][\n]
+  = @category="Comment" "--" ![\n\r]* $
   ;
 
-bool testParse(str txt) {
+bool testExpr(str txt) {
 	try return !/amb(_) := parse(#Expr,txt);
 	catch: return false;
 }
 
-public test bool n1() = testParse("1");
-public test bool n2() = testParse("1234567");
-public test bool n3() = testParse("-1234567");
-public test bool n4() = testParse("-.1234567");
-public test bool n5() = testParse("-123534.1234567");
-public test bool f1() = !testParse("-123534.");
-public test bool f2() = !testParse("-");
-public test bool f3() = !testParse("-.");
-public test bool t1() = testParse("1+1");
-public test bool t2() = testParse("1+2+3");
-public test bool t3() = testParse("1+1*2");
-public test bool t4() = testParse("1+2*3/2");
-public test bool t5() = testParse("1\<1");
-public test bool t6() = testParse("1\>2");
-public test bool t7() = testParse("1\<=2");
-public test bool t8() = testParse("1\>=2");
-public test bool t9() = testParse("1=2");
-public test bool t10() = testParse("1!=2");
-public test bool t11() = testParse("1+1*2\<1*2+3");
-public test bool t12() = testParse("1+2\<2+3&&3+4\<=4+5");
-public test bool t13() = testParse("false&&true");
+bool testCommand(str txt) {
+	try return !/amb (_) := parse(#start[Program],txt);
+	catch: return false;
+}
 
-public void render() {
-	render(visParsetree(parse(#Expr,"1+2*3/2")));
+bool testFunDef(str txt) {
+	try return !/amb (_) := parse(#FunDef,txt);
+	catch: return false;
+}
+
+bool testFunCall(str txt) {
+	try return !/amb (_) := parse(#FunCall,txt);
+	catch: return false;
+}
+
+bool testBlock(str txt) {
+	try return !/amb (_) := parse(#Block,txt);
+	catch: return false;
+}
+
+public test bool n1() = testExpr("1");
+public test bool n2() = testExpr("1234567");
+public test bool n3() = testExpr("-1234567");
+public test bool n4() = testExpr("-.1234567");
+public test bool n5() = testExpr("-123534.1234567");
+public test bool f1() = !testExpr("-123534.");
+public test bool f2() = !testExpr("-");
+public test bool f3() = !testExpr("-.");
+public test bool t1() = testExpr("1+1");
+public test bool t2() = testExpr("1+2+3");
+public test bool t3() = testExpr("1+1*2");
+public test bool t4() = testExpr("1+2*3/2");
+public test bool t5() = testExpr("1\<1");
+public test bool t6() = testExpr("1\>2");
+public test bool t7() = testExpr("1\<=2");
+public test bool t8() = testExpr("1\>=2");
+public test bool t9() = testExpr("1=2");
+public test bool t10() = testExpr("1!=2");
+public test bool t11() = testExpr("1+1*2\<1*2+3");
+public test bool t12() = testExpr("1+2\<2+3&&3+4\<=4+5");
+public test bool t13() = testExpr("false&&true");
+public test bool t14() = testFunDef("to f1 :p1 :p2 home end");
+public test bool t15() = testFunCall("f1 false&&true ;");
+public test bool t16() = testCommand("home");
+public test bool t17() = testBlock("[home home]");
+public test bool t18() = testCommand("pd;");
+public test bool t19() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home pd;]");
+public test bool t20() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home pd;] fd 5;");
+
+public void renderExpr() {
+	render1(#Expr,"1+2*3/2");
+}
+
+public void renderCommand() {
+	render1(#Command,"pd;");
+}
+
+public void renderFunDef() {
+	render1(#FunDef,"to f1 :p1 :p2 home end");
+}
+
+public void render1(t,str txt) {
+	render(visParsetree(parse(t,"to f1 :p1 :p2 home end")));
 }
