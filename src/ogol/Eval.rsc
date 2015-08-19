@@ -9,7 +9,7 @@ alias VarEnv = map[VarId id, Value val];
 
 data Value
   = boolean(bool b)
-  | number(int i)
+  | number(real i)
   ;
 
 /*

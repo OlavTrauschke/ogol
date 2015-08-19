@@ -76,7 +76,7 @@ syntax Command = cond: "if" Expr Block
 			   | wLoop: "while" Expr Block
 			   | rLoop: "repeat" Expr Block
 			   | move: Move Expr ";"
-			   | home: "home"
+			   | home: "home;"
 			   | pen: PenAct ";"
 			   | def: FunDef
 			   | call: FunCall;
@@ -93,7 +93,7 @@ lexical PenAct = "pendown" | "pd" | "penup" | "pu";
 
 keyword Reserved = "if" | "ifelse" | "while" | "repeat" | "forward" | "fd" | "back" | "bk"
 				 | "right" | "rt" | "left" | "lt" | "pendown" | "pd" | "penup" | "pu" | "to"
-				 | "true" | "false" | "end";
+				 | "true" | "false" | "end" | "home";
 
 
 lexical VarId
@@ -124,6 +124,11 @@ bool testExpr(str txt) {
 }
 
 bool testCommand(str txt) {
+	try return !/amb (_) := parse(#start[Program],txt);
+	catch: return false;
+}
+
+bool testCommandLoc(loc txt) {
 	try return !/amb (_) := parse(#start[Program],txt);
 	catch: return false;
 }
@@ -164,26 +169,30 @@ public test bool t10() = testExpr("1!=2");
 public test bool t11() = testExpr("1+1*2\<1*2+3");
 public test bool t12() = testExpr("1+2\<2+3&&3+4\<=4+5");
 public test bool t13() = testExpr("false&&true");
-public test bool t14() = testFunDef("to f1 :p1 :p2 home end");
+public test bool t14() = testFunDef("to f1 :p1 :p2 home; end");
 public test bool t15() = testFunCall("f1 false&&true ;");
-public test bool t16() = testCommand("home");
-public test bool t17() = testBlock("[home home]");
+public test bool t16() = testCommand("home;");
+public test bool t17() = testBlock("[home; home;]");
 public test bool t18() = testCommand("pd;");
-public test bool t19() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home pd;]");
-public test bool t20() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home pd;] fd 5;");
+public test bool t19() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home; pd;]");
+public test bool t20() = testCommand("if 1+2\<2+3&&3+4\<=4+5 [home; pd;] fd 5;");
 
 public void renderExpr() {
 	render1(#Expr,"1+2*3/2");
 }
 
 public void renderCommand() {
-	render1(#Command,"pd;");
+	render1(#Command,"home;");
 }
 
 public void renderFunDef() {
-	render1(#FunDef,"to f1 :p1 :p2 home end");
+	render1(#FunDef,"to f1 :p1 :p2 home; end");
 }
 
 public void render1(t,str txt) {
-	render(visParsetree(parse(t,"to f1 :p1 :p2 home end")));
+	render(visParsetree(parse(t,"to f1 :p1 :p2 home; end")));
+}
+
+public bool render2(loc txt) {
+	return testCommandLoc(txt);
 }
