@@ -15,7 +15,6 @@ Command:
  * Control flow: 
   if Expr Block
   ifelse Expr Block Block
-  while Expr Block
   repeat Expr Block
  * Drawing (mind the closing semicolons)
   forward Expr; fd Expr; back Expr; bk Expr; home;
@@ -36,7 +35,7 @@ Expressions
  * Logical: &&, ||
 
 Reserved keywords
- if, ifelse, while, repeat, forward, back, right, left, pendown, 
+ if, ifelse, repeat, forward, back, right, left, pendown, 
  penup, to, true, false, end
 
 Bonus:
@@ -73,7 +72,6 @@ lexical Boolean = "true" | "false";
 
 syntax Command = ifStat: "if" Expr Block
 			   | ifElseStat: "ifelse" Expr Block Block
-			   | whileStat: "while" Expr Block
 			   | repeatStat: "repeat" Expr Block
 			   | moveStat: Move Expr ";"
 			   | homeStat: "home" ";"
@@ -91,7 +89,7 @@ lexical Left = "left" | "lt";
 
 lexical PenAct = "pendown" | "pd" | "penup" | "pu";
 
-keyword Reserved = "if" | "ifelse" | "while" | "repeat" | "forward" | "fd" | "back" | "bk"
+keyword Reserved = "if" | "ifelse" | "repeat" | "forward" | "fd" | "back" | "bk"
 				 | "right" | "rt" | "left" | "lt" | "pendown" | "pd" | "penup" | "pu" | "to"
 				 | "true" | "false" | "end" | "home";
 
