@@ -47,7 +47,7 @@ Bonus:
 
 start syntax Program = Command*; 
 
-syntax FunDef = "to" FunId VarId* Command* "end";
+syntax FunDef = "to" FunId id VarId* Command* "end";
 syntax FunCall = FunId Expr* ";";
 
 syntax Expr = var: VarId
@@ -71,15 +71,15 @@ lexical Number = "-"?[0-9]+("."[0-9]+)?
 
 lexical Boolean = "true" | "false";
 
-syntax Command = cond: "if" Expr Block
-			   | cond2: "ifelse" Expr Block Block
-			   | wLoop: "while" Expr Block
-			   | rLoop: "repeat" Expr Block
-			   | move: Move Expr ";"
-			   | home: "home;"
-			   | pen: PenAct ";"
-			   | def: FunDef
-			   | call: FunCall;
+syntax Command = ifStat: "if" Expr Block
+			   | ifElseStat: "ifelse" Expr Block Block
+			   | whileStat: "while" Expr Block
+			   | repeatStat: "repeat" Expr Block
+			   | moveStat: Move Expr ";"
+			   | homeStat: "home" ";"
+			   | penStat: PenAct ";"
+			   | funDef: FunDef
+			   | funCall: FunCall;
 
 syntax Block = "[" Command* "]";
 
