@@ -4,6 +4,7 @@ import ogol::Syntax;
 import ogol::Canvas;
 import String;
 import ParseTree;
+import util::Math;
 
 alias FunEnv = map[FunId id, FunDef def];
 
@@ -37,11 +38,11 @@ alias State = tuple[Turtle turtle, Canvas canvas];
 // Top-level eval function
 Canvas eval(p:(Program)`<Command* cmds>`){
 	funenv = collectFunDefs(p);
-	varenv = ();
-	state = <<0, false, <0,0>>, []>;
+	VarEnv varenv = ();
+	State state = <<0, false, <0,0>>, []>;
 	
 	for(c <- cmds){
-		state = eval(c, funenv, varEnv, state);
+		state = eval(c, funenv, varenv, state);
 	}
 	
 	return state.canvas;
@@ -104,20 +105,68 @@ State eval((Command) `repeat <Expr e> <Block b>`,
 }
 
 //Command forward, fd
+State eval((Command) `forward <Expr e>;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	num distanceInDir = eval(e,venv).i;
+	num angle = state.turtle.dir/180.0*PI();
+	int horDistance = round(sin(angle)*distanceInDir);
+	int verDistance = round(cos(angle)*distanceInDir);
+	Point oldPos = state.turtle.position;
+	state.turtle.position = <oldPos.x + horDistance, oldPos.y + verDistance>;
+	if (state.turtle.pendown) {
+		state.canvas = state.canvas + line(oldPos,state.turtle.position);
+	}
+	return state;
+}
 
 //Command back, bk
+State eval((Command) `back <Expr e>;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	num distanceInDir = eval(e,venv).i;
+	num angle = state.turtle.dir/180.0*PI();
+	int horDistance = round(sin(angle)*distanceInDir);
+	int verDistance = round(cos(angle)*distanceInDir);
+	Point oldPos = state.turtle.position;
+	state.turtle.position = <oldPos.x - horDistance, oldPos.y - verDistance>;
+	if (state.turtle.pendown) {
+		state.canvas = state.canvas + line(oldPos,state.turtle.position);
+	}
+	return state;
+}
 
 //Command home
+State eval((Command) `home;`, FunEnv fenv, VarEnv venv, State state) {
+	state.turtle.position = <0,0>;
+	state.turtle.dir = 0;
+}
 
 //Command right, rt
+State eval((Command) `right <Expr e>;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	state.turtle.dir = round(state.turtle.dir + eval(e,venv).i);
+	return state;
+}
 
 //Command left, lt
+State eval((Command) `left <Expr e>;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	state.turtle.dir = round(state.turtle.dir - eval(e,venv).i);
+	return state;
+}
 
 //Command pendown, pd
+State eval((Command) `pendown;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	state.turtle.pendown = true;
+	return state;
+}
 
 //Command penup, pu
-
-//Command fundef
+State eval((Command) `pendown;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	state.turtle.pendown = false;
+	return state;
+}
 
 //Command funcall
 
