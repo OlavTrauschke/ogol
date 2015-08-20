@@ -46,7 +46,7 @@ Bonus:
 
 start syntax Program = Command* cmds; 
 
-syntax FunDef = "to" FunId id VarId* Command* cmds "end";
+syntax FunDef = "to" FunId id VarId* vars Command* cmds "end";
 syntax FunCall = FunId Expr* ";";
 
 syntax Expr = var: VarId

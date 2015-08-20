@@ -5,6 +5,7 @@ import ogol::Canvas;
 import String;
 import ParseTree;
 import util::Math;
+import Prelude;//test
 
 alias FunEnv = map[FunId id, FunDef def];
 
@@ -169,6 +170,25 @@ State eval((Command) `pendown;`,
 }
 
 //Command funcall
+State eval((Command) `<FunId x> <Expr* es>;`,
+			FunEnv fenv, VarEnv venv, State state) {
+	FunDef fun = fenv[x];
+	for (VarId vId <- fun.vars, Expr e <- es) {
+		Value v = eval(e,venv);
+		venv = venv + (vId:v);
+	}
+	
+	for (Command c <- fun.cmds) {
+		println(c);//test
+		state = state + eval(c, fenv, venv, state);
+	}
+	return state;
+}
+
+State eval((Command) `to <FunId id> <VarId* vars> <Command* cmds> end`,
+			FunEnv fenv, VarEnv venv, State state) {
+	return state;
+}
 
 //Expr var
 Value eval((Expr)`<VarId x>`, VarEnv env)
