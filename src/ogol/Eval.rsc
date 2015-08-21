@@ -5,6 +5,7 @@ import ogol::Canvas;
 import String;
 import ParseTree;
 import util::Math;
+import Prelude;
 
 alias FunEnv = map[FunId id, FunDef def];
 
@@ -78,6 +79,7 @@ Program desugar(Program p){
 //Block
 State eval((Block) `[<Command* cmds>]`, FunEnv fenv, VarEnv venv, State state) {
 	for(c <- cmds){
+		println(c);println("");
 		state = eval(c, fenv, venv, state);
 	}
 	return state;
@@ -161,7 +163,7 @@ State eval((Command) `pendown;`,
 }
 
 //Command penup, pu
-State eval((Command) `pendown;`,
+State eval((Command) `penup;`,
 			FunEnv fenv, VarEnv venv, State state) {
 	state.turtle.pendown = false;
 	return state;
