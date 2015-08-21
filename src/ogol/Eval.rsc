@@ -5,7 +5,7 @@ import ogol::Canvas;
 import String;
 import ParseTree;
 import util::Math;
-import Prelude;//test
+import Prelude;
 
 alias FunEnv = map[FunId id, FunDef def];
 
@@ -43,6 +43,7 @@ Canvas eval(p:(Program)`<Command* cmds>`){
 	State state = <<0, false, <0,0>>, []>;
 	
 	for(c <- cmds){
+		println(c);println("");
 		state = eval(c, funenv, varenv, state);
 	}
 	
@@ -87,8 +88,7 @@ State eval((Block) `[<Command* cmds>]`, FunEnv fenv, VarEnv venv, State state) {
 //Command if, ifelse
 State eval((Command) `ifelse <Expr e> <Block b1> <Block b2>`,
 			FunEnv fenv, VarEnv venv, State state) {
-	boolean(c) = eval(e,venv);
-	if (c) {
+	if (eval(e,venv).b) {
 		return eval(b1,fenv,venv,state);
 	}
 	else {
@@ -170,17 +170,16 @@ State eval((Command) `pendown;`,
 }
 
 //Command funcall
-State eval((Command) `<FunId x> <Expr* es>;`,
+State eval((Command) `<FunId id> <Expr* es>;`,
 			FunEnv fenv, VarEnv venv, State state) {
-	FunDef fun = fenv[x];
+	FunDef fun = fenv[id];
 	for (VarId vId <- fun.vars, Expr e <- es) {
 		Value v = eval(e,venv);
 		venv = venv + (vId:v);
 	}
 	
 	for (Command c <- fun.cmds) {
-		println(c);//test
-		state = state + eval(c, fenv, venv, state);
+		state = eval(c, fenv, venv, state);
 	}
 	return state;
 }

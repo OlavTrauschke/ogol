@@ -65,8 +65,8 @@ syntax Expr = var: VarId
 			> left (and: Expr "&&" Expr
 			| or: Expr "||" Expr);
 
-lexical Number = "-"?[0-9]+("."[0-9]+)?
-			   | "-"?"."[0-9]+;
+lexical Number = "-"?[0-9]+("."[0-9]+)? !>> [0-9.]
+			   | "-"?"."[0-9]+ !>> [0-9.];
 
 lexical Boolean = "true" | "false";
 
