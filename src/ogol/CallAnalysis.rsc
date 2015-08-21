@@ -8,16 +8,18 @@ alias Fun = str;
 alias Calls = rel[Fun, Fun];
 alias Funs = set[Fun];
 
-Calls getCallGraph(Program p) {
-	calls = {};
+/*
 	for(cmd <- p.cmds) {
 		calls = calls + getCallsFromCommand(cmd,"global");
 	}
 	for (/FunDef f := p) {
 		calls = calls + getCallsFromFunction(f);
 	}
-	return calls;
-}
+*/
+Calls getCallGraph(Program p)
+	= {*getCallsFromCommand(cmd,"global") | cmd <- p.cmd}
+	+ {*getCallsFromFunction(f) | /FunDef f <- p}
+	;
 
 Calls getCallsFromFunction(FunDef f) {
 	calls = {};
@@ -52,9 +54,7 @@ Calls getCallsFromBlock((Block) `[<Command* cmds>]`,Fun fId) {
 	return calls;
 }
 
-default Calls getCallsFromCommand(Command cmd,Fun fId) {
-	return {};
-}
+default Calls getCallsFromCommand(Command cmd,Fun fId) = {};
 
 Calls getTransCallGraph(Program p)
 	= getCallGraph(p)+;
