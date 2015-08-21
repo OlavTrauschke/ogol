@@ -5,7 +5,6 @@ import ogol::Canvas;
 import String;
 import ParseTree;
 import util::Math;
-import Prelude;
 
 alias FunEnv = map[FunId id, FunDef def];
 
@@ -43,7 +42,6 @@ Canvas eval(p:(Program)`<Command* cmds>`){
 	State state = <<0, false, <0,0>>, []>;
 	
 	for(c <- cmds){
-		println(c);println("");
 		state = eval(c, funenv, varenv, state);
 	}
 	
