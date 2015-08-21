@@ -137,6 +137,7 @@ State eval((Command) `back <Expr e>;`,
 State eval((Command) `home;`, FunEnv fenv, VarEnv venv, State state) {
 	state.turtle.position = <0,0>;
 	state.turtle.dir = 0;
+	return state;
 }
 
 //Command right, rt
